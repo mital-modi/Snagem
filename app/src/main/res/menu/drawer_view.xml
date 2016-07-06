@@ -1,0 +1,28 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/Home"
+            android:checked="true"
+            android:icon="@drawable/homepage"
+            android:title="Home" />
+        <item
+            android:id="@+id/Profile"
+            android:icon="@drawable/profile"
+            android:title="Profile" />
+        <item
+            android:id="@+id/Inbox"
+            android:icon="@drawable/inbox"
+            android:title="Inbox" />
+
+        <item
+            android:id="@+id/Network"
+            android:icon="@drawable/share"
+            android:title="Network" />
+
+        <item
+            android:id="@+id/Team"
+            android:icon="@drawable/team2"
+            android:title="Team" />
+    </group>
+</menu>
