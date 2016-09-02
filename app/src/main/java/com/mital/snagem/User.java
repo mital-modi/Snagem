@@ -16,18 +16,6 @@ public class User {
     private String team;
     private int points;
 
-    public User(int id, String name, String gender, String school, String classification, String email, String password){
-        this.id = id;
-        this.name = name;
-        this.gender = gender;
-        this.school = school;
-        this.classification = classification;
-        this.email = email;
-        this.password = password;
-        tags = new String[13];
-
-    }
-
     public int getId() {
         return id;
     }

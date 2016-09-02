@@ -1,36 +1,51 @@
 package com.mital.snagem;
-import android.os.Bundle;
 import android.app.Activity;
-import android.view.Menu;
-import android.view.View;
 import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+
 
 public class Home extends Activity {
+    Button login, register, htp;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-    }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_home, menu);
-        return true;
-    }
+        // Get The Reference Of Buttons
+        login=(Button) findViewById(R.id.btn_login);
+        register=(Button) findViewById(R.id.btn_rgstr);
+        htp=(Button) findViewById(R.id.btn_htp);
 
-    public void activityLogin(View view){
-        Intent intent = new Intent(this, Login.class);
-        startActivity(intent);
-    }
+        register.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
 
-    public void activityHowToPlay(View view){
-        Intent intent = new Intent(this, HowToPlay.class);
-        startActivity(intent);
-    }
+                // Create Intent for register activity and Start The Activity
+                Intent intent=new Intent(getApplicationContext(),Register.class);
+                startActivity(intent);
+            }
+        });
 
-    public void activityPreregister(View view){
-        Intent intent = new Intent(this, Preregister.class);
-        startActivity(intent);
+        htp.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+
+                // Create Intent for register activity and Start The Activity
+                Intent intent=new Intent(getApplicationContext(),Userhome.class);
+                startActivity(intent);
+            }
+        });
+
+        login.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+
+                // Create Intent for register activity and Start The Activity
+                Intent intent=new Intent(getApplicationContext(),Login.class);
+                startActivity(intent);
+            }
+        });
     }
 
 }

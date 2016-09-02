@@ -1,235 +1,83 @@
 package com.mital.snagem;
 
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.AsyncTask;
-import org.json.JSONException;
-import org.json.JSONObject;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
-import com.mital.snagem.DatabaseHandler;
-import com.mital.snagem.UserFunctions;
-
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-
 
 public class Login extends Activity {
 
     Button btnLogin;
     Button btnRegister;
-    Button passreset;
-    EditText inputEmail;
-    EditText inputPassword;
-    private TextView loginErrorMsg;
+    Button btnReset;
+    DataBaseHelper db;
 
-    /**
-     * Called when the activity is first created.
-     */
-    private static String KEY_SUCCESS = "success";
-    private static String KEY_UID = "uid";
-    private static String KEY_USERNAME = "uname";
-    private static String KEY_EMAIL = "email";
-    private static String KEY_CREATED_AT = "created_at";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        inputEmail = (EditText) findViewById(R.id.input_email);
-        inputPassword = (EditText) findViewById(R.id.input_password);
+        final EditText inputEmail = (EditText) findViewById(R.id.input_email);
+        final EditText inputPassword = (EditText) findViewById(R.id.input_password);
         btnLogin = (Button) findViewById(R.id.login);
-        passreset = (Button) findViewById(R.id.reset_password);
-        loginErrorMsg = (TextView) findViewById(R.id.error_msg);
+        btnReset = (Button) findViewById(R.id.reset_password);
         btnRegister = (Button) findViewById(R.id.register);
 
-        passreset.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                Intent myIntent = new Intent(view.getContext(), ResetPassword.class);
-                startActivityForResult(myIntent, 0);
-                finish();
-            }
-        });
+        // create a instance of SQLite Database
+        db=new DataBaseHelper(this);
+
 
         btnRegister.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                Intent myIntent = new Intent(view.getContext(), Register.class);
-                startActivityForResult(myIntent, 0);
-                finish();
+            public void onClick(View v) {
+                // Create Intent for register activity and Start The Activity
+                Intent intent=new Intent(getApplicationContext(),Register.class);
+                startActivity(intent);
             }
         });
 
-        /**
-         * Login button click event
-         * A Toast is set to alert when the Email and Password field is empty
-         **/
+        btnReset.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Create Intent for register activity and Start The Activity
+                Intent intent=new Intent(getApplicationContext(),ResetPassword.class);
+                startActivity(intent);
+            }
+        });
+
         btnLogin.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                String email = inputEmail.getText().toString();
+                String password = inputPassword.getText().toString();
+                String storedPassword = db.searchPass(email);
 
-            public void onClick(View view) {
-
-                if ((!inputEmail.getText().toString().equals("")) && (!inputPassword.getText().toString().equals(""))) {
-                    NetAsync(view);
+                if(email.isEmpty() || password.isEmpty()){
+                    Toast.makeText(Login.this, " Username or Password field empty", Toast.LENGTH_LONG).show();
                 }
-                else if ((!inputEmail.getText().toString().equals(""))) {
-                    Toast.makeText(getApplicationContext(),
-                            "Password field empty", Toast.LENGTH_SHORT).show();
-                } else if ((!inputPassword.getText().toString().equals(""))) {
-                    Toast.makeText(getApplicationContext(),
-                            "Email field empty", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getApplicationContext(),
-                            "Email and Password field are empty", Toast.LENGTH_SHORT).show();
+
+                else if(password.equals(storedPassword)){
+                    Intent intent=new Intent(getApplicationContext(),Userhome.class);
+                    startActivity(intent);
+
+                }
+                else {
+                    Toast.makeText(Login.this, "Invalid Username or Password", Toast.LENGTH_LONG).show();
                 }
             }
         });
-    }
-    /**
-     * Async Task to check whether internet connection is working.
-     **/
 
-
-
-    private class NetCheck extends AsyncTask
-    {
-        private ProgressDialog nDialog;
-
-
-        @Override
-        protected Boolean doInBackground(Object[] params) {
-            ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo netInfo = cm.getActiveNetworkInfo();
-            if (netInfo != null && netInfo.isConnected()) {
-                try {
-                    URL url = new URL("http://www.google.com");
-                    HttpURLConnection urlc = (HttpURLConnection) url.openConnection();
-                    urlc.setConnectTimeout(3000);
-                    urlc.connect();
-                    if (urlc.getResponseCode() == 200) {
-                        return true;
-                    }
-                } catch (MalformedURLException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-            return false;
-        }
-
-        @Override
-        protected void onPreExecute(){
-            super.onPreExecute();
-            nDialog = new ProgressDialog(Login.this);
-            nDialog.setMessage("Loading..");
-            nDialog.setTitle("Checking Network");
-            nDialog.setIndeterminate(false);
-            nDialog.setCancelable(true);
-            nDialog.show();
-        }
-
-
-        protected void onPostExecute(Boolean th){
-
-            if(th == true){
-                nDialog.dismiss();
-                new ProcessLogin().execute();
-            }
-            else{
-                nDialog.dismiss();
-                loginErrorMsg.setText("Error in Network Connection");
-            }
-        }
     }
 
-
-    private class ProcessLogin extends AsyncTask {
-
-        /**
-         * Defining Process dialog
-         **/
-        private ProgressDialog pDialog;
-
-        String email,password;
-
-
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            inputEmail = (EditText) findViewById(R.id.input_email);
-            inputPassword = (EditText) findViewById(R.id.input_password);
-            email = inputEmail.getText().toString();
-            password = inputPassword.getText().toString();
-            pDialog = new ProgressDialog(Login.this);
-            pDialog.setTitle("Contacting Servers");
-            pDialog.setMessage("Registering ...");
-            pDialog.setIndeterminate(false);
-            pDialog.setCancelable(true);
-            pDialog.show();
-        }
-
-        @Override
-        protected Object doInBackground(Object[] params) {
-            UserFunctions userFunction = new UserFunctions();
-            JSONObject json = userFunction.loginUser(email, password);
-            return json;
-        }
-
-        protected void onPostExecute(JSONObject json) {
-            try {
-                if (json.getString(KEY_SUCCESS) != null) {
-
-                    String res = json.getString(KEY_SUCCESS);
-
-                    if(Integer.parseInt(res) == 1){
-                        pDialog.setMessage("Loading User Space");
-                        pDialog.setTitle("Getting Data");
-                        DatabaseHandler db = new DatabaseHandler(getApplicationContext());
-                        JSONObject json_user = json.getJSONObject("user");
-                        /**
-                         * Clear all previous data in SQlite database.
-                         **/
-                        UserFunctions logout = new UserFunctions();
-                        logout.logoutUser(getApplicationContext());
-                        db.addUser(json_user.getString(KEY_EMAIL),json_user.getString(KEY_USERNAME),json_user.getString(KEY_UID),json_user.getString(KEY_CREATED_AT));
-                        /**
-                         *If JSON array details are stored in SQlite it launches the User Panel.
-                         **/
-                        Intent upanel = new Intent(getApplicationContext(), Userhome.class);
-                        upanel.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        pDialog.dismiss();
-                        startActivity(upanel);
-                        /**
-                         * Close Login Screen
-                         **/
-                        finish();
-                    }else{
-
-                        pDialog.dismiss();
-                        loginErrorMsg.setText("Incorrect username/password");
-                    }
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        // Close The Database
+        db.close();
     }
-    public void NetAsync(View view){
-        new NetCheck().execute();
-    }
+
 }
 
 

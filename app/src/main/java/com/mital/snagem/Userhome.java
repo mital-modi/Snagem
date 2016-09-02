@@ -16,7 +16,7 @@ public class Userhome extends AppCompatActivity {
 
     private DrawerLayout mDrawer;
     private Toolbar toolbar;
-    private NavigationView nvDrawer;
+    private NavigationView nvDrawer, nvDrawer1;
     private ActionBarDrawerToggle drawerToggle;
 
 
@@ -56,6 +56,12 @@ public class Userhome extends AppCompatActivity {
         nvDrawer = (NavigationView) findViewById(R.id.nvView);
         // Setup drawer view
         setupDrawerContent(nvDrawer);
+
+        nvDrawer1 = (NavigationView) findViewById(R.id.nvView1);
+        // Setup drawer view
+        setupDrawerContent(nvDrawer1);
+
+
 
     }
 

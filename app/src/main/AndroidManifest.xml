@@ -57,7 +57,7 @@
                 android:value="com.mital.snagem.Home" />
         </activity>
         <activity
-            android:name=".Preregister"
+            android:name=".Terms"
             android:label="@string/title_activity_register1"
             android:parentActivityName=".Register"
             android:theme="@style/AppTheme.NoActionBar">
@@ -70,7 +70,16 @@
         <activity android:name=".Inbox" />
         <activity android:name=".Network" />
         <activity android:name=".Team" />
-        <activity android:name=".ResetPassword"></activity>
+        <activity android:name=".ResetPassword" />
+        <activity
+            android:name=".Dashboard"
+            android:label="@string/title_activity_dashboard"
+            android:parentActivityName=".Login"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.mital.snagem.Login" />
+        </activity>
     </application>
 
 </manifest>
